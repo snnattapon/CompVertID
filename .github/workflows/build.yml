@@ -1,0 +1,82 @@
+name: Build executables
+
+# สร้างไฟล์ .exe / .app อัตโนมัติเมื่อ push tag เวอร์ชัน (เช่น v0.1.0)
+# หรือสั่งรันเองผ่านหน้า Actions (workflow_dispatch)
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+# repo ยุคใหม่ default เป็น read-only — ต้องขอสิทธิ์เขียนเพื่อสร้าง release
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build on ${{ matrix.label }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false   # ถ้า OS หนึ่งพัง อีก OS ยัง build ต่อ
+      matrix:
+        include:
+          - os: windows-latest
+            label: Windows
+            artifact_name: CompVertID-Windows
+            binary_path: build/dist/CompVertID.exe
+          - os: macos-13          # Intel Mac (x86_64)
+            label: macOS-Intel
+            artifact_name: CompVertID-macOS-Intel
+            binary_path: build/dist/CompVertID
+          - os: macos-latest      # Apple Silicon (arm64)
+            label: macOS-AppleSilicon
+            artifact_name: CompVertID-macOS-AppleSilicon
+            binary_path: build/dist/CompVertID
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies + build tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[build]"
+
+      - name: Build executable (onefile)
+        run: pyinstaller build/compvertid.spec --distpath build/dist --workpath build/tmp
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.binary_path }}
+          if-no-files-found: error
+          retention-days: 14
+
+  # รวม binary ทุก OS แนบเข้ากับ GitHub Release (เฉพาะตอน push tag)
+  release:
+    name: Attach binaries to release
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: CompVertID-*
+
+      - name: List downloaded files
+        run: find artifacts -type f
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true

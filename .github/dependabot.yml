@@ -1,0 +1,38 @@
+# Dependabot — ตัวช่วยดูแลให้ dependency และ GitHub Actions ทันสมัยอัตโนมัติ
+# มันจะเปิด Pull Request มาให้เราตรวจ+merge เมื่อมีเวอร์ชันใหม่
+#
+# หมายเหตุ (2026): คำสั่งแบบพิมพ์ comment ใน PR เช่น "@dependabot merge"
+# ถูกยกเลิกแล้ว — ให้กดปุ่มใน GitHub UI แทน
+version: 2
+
+updates:
+  # 1) ดูเวอร์ชันของ GitHub Actions ที่ใช้ใน .github/workflows
+  #    (เช่น actions/checkout, actions/setup-python) — กันปัญหา action ตกรุ่น
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # รวม PR ของ action ทั้งหมดเป็นก้อนเดียว ไม่ให้ PR ท่วม
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "github-actions"
+
+  # 2) ดูเวอร์ชันของ Python dependencies (pandas, requests, openpyxl, tqdm, ...)
+  #    อ่านจาก pyproject.toml ที่ราก repo
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # จำกัด PR เปิดพร้อมกันไม่เกิน 5 (default) กันรก
+    open-pull-requests-limit: 5
+    groups:
+      python-dependencies:
+        patterns:
+          - "*"
+    labels:
+      - "dependencies"
+      - "python"

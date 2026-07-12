@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "compvertid"
+version = "0.1.0"
+description = "CompVertID — convert compound names/identifiers to database IDs (currently KEGG) with verification and confidence scoring"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Nattapon Simanon" },
+]
+keywords = ["metabolomics", "KEGG", "compound discoverer", "mass spectrometry", "annotation"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
+
+# dependencies หลัก — pin ขั้นต่ำแบบพอประมาณ (>=) เพื่อความยืดหยุ่น
+# แต่กันเวอร์ชันเก่าเกินไปที่ API ต่างกัน
+dependencies = [
+    "pandas>=2.0",
+    "requests>=2.28",
+    "openpyxl>=3.1",
+    "tqdm>=4.60",
+    "platformdirs>=3.0",
+]
+
+[project.optional-dependencies]
+# สำหรับ build binary เอง (ผู้ใช้ทั่วไปไม่ต้องลง)
+build = [
+    "pyinstaller>=6.0",
+]
+
+[project.scripts]
+# คำสั่ง CLI: พิมพ์ `compvertid` ใน terminal ได้เลยหลัง pip install
+compvertid = "compvertid.cli:main"
+
+[project.gui-scripts]
+# คำสั่ง GUI (ไม่เปิด console บน Windows)
+compvertid-gui = "compvertid.gui:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+compvertid = ["py.typed"]

@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+.eggs/
+
+# Build artifacts
+build/dist/
+build/tmp/
+build/build_tmp/
+dist/
+*.spec.bak
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# PyInstaller
+*.manifest
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Output / logs (ไม่ commit ผลลัพธ์และ log)
+*.log
+kegg_mapping_results.xlsx
+compvertid_run_*.log
+
+# Test outputs
+/tmp/
+test_output*.xlsx
