@@ -69,8 +69,8 @@ def _open_folder(path: Path):
 class CompVertIDGUI:
     def __init__(self, root):
         self.root = root
-        self.root.geometry("820x620")
-        self.root.minsize(720, 540)
+        self.root.geometry("820x680")
+        self.root.minsize(720, 600)
 
         # ภาษาปัจจุบัน (default = en) — ต้องตั้งก่อน _build_ui เพราะ UI ใช้ค่านี้
         self.lang = i18n.DEFAULT_LANG
