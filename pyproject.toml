@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "compvertid"
-version = "0.1.0"
+dynamic = ["version"]
 description = "CompVertID — convert compound names/identifiers to database IDs (currently KEGG) with verification and confidence scoring"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -50,3 +50,6 @@ where = ["src"]
 
 [tool.setuptools.package-data]
 compvertid = ["py.typed"]
+
+[tool.setuptools.dynamic]
+version = { attr = "compvertid.__version__" }
