@@ -23,15 +23,15 @@ jobs:
           - os: windows-latest
             label: Windows
             artifact_name: CompVertID-Windows
-            binary_path: build/dist/CompVertID.exe
+            binary_path: build/dist/CompVertID-Windows.exe
           - os: macos-13          # Intel Mac (x86_64)
             label: macOS-Intel
             artifact_name: CompVertID-macOS-Intel
-            binary_path: build/dist/CompVertID
+            binary_path: build/dist/CompVertID-macOS-Intel
           - os: macos-latest      # Apple Silicon (arm64)
             label: macOS-AppleSilicon
             artifact_name: CompVertID-macOS-AppleSilicon
-            binary_path: build/dist/CompVertID
+            binary_path: build/dist/CompVertID-macOS-AppleSilicon
 
     steps:
       - name: Checkout
@@ -50,6 +50,15 @@ jobs:
 
       - name: Build executable (onefile)
         run: pyinstaller build/compvertid.spec --distpath build/dist --workpath build/tmp
+
+      - name: Rename binary to include platform
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            mv "build/dist/CompVertID.exe" "${{ matrix.binary_path }}"
+          else
+            mv "build/dist/CompVertID" "${{ matrix.binary_path }}"
+          fi
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v7
