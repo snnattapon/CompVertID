@@ -29,7 +29,7 @@ app_name = "CompVertID"
 block_cipher = None
 
 a = Analysis(
-    ["../src/compvertid/gui.py"],
+    ["launcher.py"],
     pathex=["../src"],
     binaries=[],
     datas=[],
