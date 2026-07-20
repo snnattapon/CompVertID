@@ -15,6 +15,14 @@ build ด้วย:
 import sys
 from pathlib import Path
 
+# To read __version__ from src without importing the whole package (avoid dependency while building)
+_init = Path(SPECPATH).parent / "src" / "compvertid" / "__init__.py"
+_version_line = next(
+    ln for ln in _init.read_text(encoding="utf-8").splitlines()
+    if ln.strip().startswith("__version__")
+)
+app_version = _version_line.split("=")[1].strip().strip('"').strip("'")
+
 # ชื่อ executable ต่อ OS
 app_name = "CompVertID"
 
@@ -79,6 +87,6 @@ if sys.platform == "darwin":
         bundle_identifier="org.compvertid.app",
         info_plist={
             "NSHighResolutionCapable": "True",
-            "CFBundleShortVersionString": "0.1.0",
+            "CFBundleShortVersionString": app_version,
         },
     )
