@@ -23,7 +23,7 @@ jobs:
           - os: windows-latest
             label: Windows
             artifact_name: CompVertID-Windows
-            binary_path: build/dist/CompVertID-Windows.exe
+            binary_path: build/dist/CompVertID-Windows.zip
           - os: macos-15-intel    # Intel Mac (x86_64)
             label: macOS-Intel
             artifact_name: CompVertID-macOS-Intel
@@ -48,17 +48,19 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[build]"
 
-      - name: Build executable (onefile)
+      - name: Build executable (onedir)
         run: pyinstaller build/compvertid.spec --distpath build/dist --workpath build/tmp
 
       - name: Package artifact
         shell: bash
         run: |
           if [ "${{ runner.os }}" = "Windows" ]; then
-            # Windows: .exe เดี่ยว แค่เปลี่ยนชื่อ
-            mv "build/dist/CompVertID.exe" "${{ matrix.binary_path }}"
+            # Windows onedir: ผลลัพธ์เป็นโฟลเดอร์ build/dist/CompVertID/
+            # zip ทั้งโฟลเดอร์ (PowerShell Compress-Archive รักษาโครงสร้างได้)
+            powershell -Command "Compress-Archive -Path 'build/dist/CompVertID/*' -DestinationPath '${{ matrix.binary_path }}' -Force"
           else
-            # macOS: ห่อ .app แล้ว zip ด้วย ditto (รักษาโครงสร้าง + permission)
+            # macOS onedir: ผลลัพธ์เป็น .app (ห่อโฟลเดอร์ไว้แล้ว)
+            # zip ด้วย ditto (รักษาโครงสร้าง .app + permission)
             ditto -c -k --keepParent \
               "build/dist/CompVertID.app" \
               "${{ matrix.binary_path }}"

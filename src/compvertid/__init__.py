@@ -1,6 +1,6 @@
 """CompVertID — map Compound Discoverer output to KEGG IDs."""
 
-__version__ = "0.1.5"
+__version__ = "0.1.6"
 
 from .kegg_api import KeggClient
 from .core import (

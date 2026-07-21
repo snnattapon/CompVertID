@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec — build GUI เป็นไฟล์เดียว (--onefile)
+PyInstaller spec — build GUI เป็นโฟลเดอร์ (--onedir)
 
 ใช้ได้ทั้ง Windows และ macOS (PyInstaller เลือก format ตาม OS ที่ build ให้เอง)
 สร้างจาก entry point ของ GUI: src/compvertid/gui.py
@@ -55,20 +55,20 @@ a = Analysis(
 
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
+# onedir: EXE เก็บแค่ bootloader + scripts (ไม่ยัด binaries/datas เข้าไฟล์เดียว)
+#         binaries/datas จะถูก COLLECT แยกเป็นไฟล์ในโฟลเดอร์ข้าง ๆ แทน
+#         → ไม่ต้องแตกไฟล์ตอนรัน (เปิดเร็วขึ้น + ลด false positive ของ antivirus)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,  # << หัวใจของ onedir: ไม่รวม binaries ใน EXE
     name=app_name,
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
     upx_exclude=[],
-    runtime_tmpdir=None,
     console=False,          # GUI app — ไม่เปิดหน้าต่าง console
     disable_windowed_traceback=False,
     argv_emulation=True,    # macOS: ให้เปิดไฟล์ที่ลากมาวางบนไอคอนได้
@@ -78,10 +78,22 @@ exe = EXE(
     icon=None,              # ใส่ path ไอคอนภายหลังได้ (.ico บน Win, .icns บน Mac)
 )
 
+# onedir: COLLECT รวม exe + binaries + datas เป็น "โฟลเดอร์" ผลลัพธ์
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=True,
+    upx_exclude=[],
+    name=app_name,
+)
+
 # บน macOS: ห่อเป็น .app bundle ด้วย
 if sys.platform == "darwin":
     app = BUNDLE(
-        exe,
+        coll,
         name=f"{app_name}.app",
         icon=None,
         bundle_identifier="org.compvertid.app",
