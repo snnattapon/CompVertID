@@ -149,5 +149,5 @@ Choline,C5H13NO,C00114
 
 ข้อมูลสารประกอบดึงจาก [KEGG](https://www.kegg.jp/) ผ่าน KEGG REST API
 
-## Cite
+## Reference
 Huckvale, E., & Moseley, H. N. B. (2023). kegg_pull: a software package for the RESTful access and pulling from the Kyoto Encyclopedia of Gene and Genomes. BMC bioinformatics, 24(1), 78. https://doi.org/10.1186/s12859-023-05208-0
